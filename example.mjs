@@ -44,6 +44,9 @@ await db.ready()
 
 // List db on update
 db.view.core.on('append', async () => {
+  // Skip append event for hyperbee's header block
+  if (db.view.version === 1) return
+
   console.log('current db key/value pairs')
   for await (const node of db.createReadStream()) {
     console.log('key', node.key)
