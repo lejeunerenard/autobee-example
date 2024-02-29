@@ -30,7 +30,7 @@ joining 8ee02940cf97622f5af9940493350b370a09ef0f776ad48ddb1693f569bc3111
 
 putting a key
 current db key/value pairs
-key 0b2d7440e25d95f10d07bbf5860b77cd640e5e97cbaa2d1dee3c66214deaec28
+key <Buffer 0b 2d 74 40 e2 5d 95 f1 0d 07 bb f5 86 0b 77 cd 64 0e 5e 97 cb aa 2d 1d ee 3c 66 21 4d ea ec 28>
 value { message: 'was here', timestamp: '2024-02-28T22:48:02.961Z'  }
 
 Enter db.keys to add as a writer.
@@ -66,6 +66,10 @@ Should output something like:
 bootstrap 0b2d7440e25d95f10d07bbf5860b77cd640e5e97cbaa2d1dee3c66214deaec28
 joining 8ee02940cf97622f5af9940493350b370a09ef0f776ad48ddb1693f569bc3111
 
+current db key/value pairs
+key <Buffer 0b 2d 74 40 e2 5d 95 f1 0d 07 bb f5 86 0b 77 cd 64 0e 5e 97 cb aa 2d 1d ee 3c 66 21 4d ea ec 28>
+value { message: 'was here', timestamp: '2024-02-28T22:48:02.961Z'  }
+
 putting a key
 db isnt writable yet
 have another writer add the following key
@@ -93,9 +97,9 @@ showing the put was applied like the following:
 
 ```
 current db key/value pairs
-key 0b2d7440e25d95f10d07bbf5860b77cd640e5e97cbaa2d1dee3c66214deaec28
+key <Buffer 0b 2d 74 40 e2 5d 95 f1 0d 07 bb f5 86 0b 77 cd 64 0e 5e 97 cb aa 2d 1d ee 3c 66 21 4d ea ec 28>
 value { message: 'was here', timestamp: '2024-02-28T22:48:02.961Z' }
 
-key 73c66321463d1072678cffa36b98f4933ba9d0c7046ff3465a1f61c37e91d4d6
+key <Buffer 73 c6 63 21 46 3d 10 72 67 8c ff a3 6b 98 f4 93 3b a9 d0 c7 04 6f f3 46 5a 1f 61 c3 7e 91 d4 d6>
 value { message: 'was here', timestamp: '2024-02-28T23:06:09.436Z' }
 ```
