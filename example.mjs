@@ -40,7 +40,7 @@ const db = new Autobee(store, bootstrap, {
 // Print any errors from apply() etc
   .on('error', console.error)
 
-await db.ready()
+await db.update()
 
 // List db on update
 db.view.core.on('append', async () => {
