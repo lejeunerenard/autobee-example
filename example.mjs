@@ -14,6 +14,12 @@ function addWriter (db, key) {
   })
 }
 
+// Setup terminal interface
+const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout
+})
+
 const store = new Corestore(storageDir)
 const bootstrap = args[0]
 console.log('bootstrap', bootstrap)
@@ -24,7 +30,7 @@ const db = new Autobee(store, bootstrap, {
     for (const node of batch) {
       const op = node.value
       if (op.type === 'addWriter') {
-        console.log('Adding writer', op.key)
+        console.log('\rAdding writer', op.key)
         await base.addWriter(b4a.from(op.key, 'hex'))
         continue
       }
@@ -47,12 +53,14 @@ db.view.core.on('append', async () => {
   // Skip append event for hyperbee's header block
   if (db.view.version === 1) return
 
-  console.log('current db key/value pairs')
+  rl.pause()
+  console.log('\rcurrent db key/value pairs')
   for await (const node of db.createReadStream()) {
     console.log('key', node.key)
     console.log('value', node.value)
     console.log()
   }
+  rl.prompt()
 })
 
 if (!bootstrap) {
@@ -61,7 +69,8 @@ if (!bootstrap) {
 
 const swarm = new Hyperswarm()
 swarm.on('connection', (connection, peerInfo) => {
-  console.log('peer joined', b4a.toString(peerInfo.publicKey, 'hex').substring(0, 4))
+  console.log('\rpeer joined', b4a.toString(peerInfo.publicKey, 'hex').substring(0, 4))
+  rl.prompt()
   db.replicate(connection)
 })
 
@@ -69,6 +78,7 @@ console.log('joining', b4a.toString(db.discoveryKey, 'hex'))
 const discovery = swarm.join(db.discoveryKey)
 await discovery.flushed()
 
+rl.pause()
 console.log()
 console.log('putting a key')
 
@@ -82,13 +92,7 @@ if (db.writable) {
   console.log(b4a.toString(db.local.key, 'hex'))
 }
 
-// Setup add writer config
-const rl = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout
-})
-
-console.log(`Enter db.keys to add as a writer.
+console.log(`\rEnter db.keys to add as a writer.
 Otherwise enter 'exit' to exit.`)
 rl.on('line', async (line) => {
   if (!line) {
