@@ -33,8 +33,8 @@ const db = new Autobee(store, bootstrap, {
     // Pass through to Autobee's apply
     await Autobee.apply(batch, view, base)
   },
+
   // Set encodings for autobase/hyperbee
-  keyEncoding: 'utf-8',
   valueEncoding: 'json'
 })
 await db.ready()
@@ -66,7 +66,7 @@ await discovery.flushed()
 console.log()
 console.log('putting a key')
 
-const simplePut = (db) => db.put(b4a.toString(db.local.key, 'hex'), { message: 'was here', timestamp: new Date() })
+const simplePut = (db) => db.put(db.local.key, { message: 'was here', timestamp: new Date() })
 
 if (db.writable) {
   await simplePut(db)

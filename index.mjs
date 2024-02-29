@@ -29,9 +29,9 @@ export default class Autobee extends Autobase {
     for (const node of batch) {
       const op = node.value
       if (op.type === 'put') {
-        await b.put(op.key, op.value, op.opts)
+        await b.put(b4a.from(op.key), op.value, op.opts)
       } else if (op.type === 'del') {
-        await b.del(op.key, op.opts)
+        await b.del(b4a.from(op.key), op.opts)
       }
     }
 
