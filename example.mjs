@@ -37,6 +37,9 @@ const db = new Autobee(store, bootstrap, {
   // Set encodings for autobase/hyperbee
   valueEncoding: 'json'
 })
+// Print any errors from apply() etc
+  .on('error', console.error)
+
 await db.ready()
 
 // List db on update
