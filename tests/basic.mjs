@@ -1,6 +1,7 @@
 import test from 'tape'
 import Corestore from 'corestore'
 import RAM from 'random-access-memory'
+import SubEncoder from 'sub-encoder'
 import Autobee from '../index.mjs'
 import b4a from 'b4a'
 
@@ -11,17 +12,32 @@ test('basic usage', (t) => {
     t.equals(db._handlers.apply, Autobee.apply)
   })
 
-  t.test('put', async (t) => {
-    const store = new Corestore(RAM)
-    const db = new Autobee(store, { valueEncoding: 'json' })
-    await db.put('foo', 2)
-    await db.put('bar', 'string')
+  t.test('put', (t) => {
+    t.test('basic', async (t) => {
+      const store = new Corestore(RAM)
+      const db = new Autobee(store, { valueEncoding: 'json' })
+      await db.put('foo', 2)
+      await db.put('bar', 'string')
 
-    const fooNode = await db.get('foo')
-    t.equals(fooNode.value, 2)
+      const fooNode = await db.get('foo')
+      t.equals(fooNode.value, 2)
 
-    const barNode = await db.get('bar')
-    t.equals(barNode.value, 'string')
+      const barNode = await db.get('bar')
+      t.equals(barNode.value, 'string')
+    })
+
+    t.test('w/ opts', async (t) => {
+      const store = new Corestore(RAM)
+      const subEnc = new SubEncoder('beep')
+      const db = new Autobee(store, { valueEncoding: 'json' })
+      await db.put('foo', 2, { keyEncoding: subEnc })
+
+      const fooNodeNoEnc = await db.get('foo')
+      t.equals(fooNodeNoEnc, null)
+
+      const fooNodeEnc = await db.get('foo', { keyEncoding: subEnc })
+      t.equals(fooNodeEnc.value, 2)
+    })
   })
 
   t.test('del', async (t) => {

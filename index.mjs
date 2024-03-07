@@ -42,7 +42,8 @@ export default class Autobee extends Autobase {
     return this.append({
       type: 'put',
       key,
-      value
+      value,
+      opts
     })
   }
 
