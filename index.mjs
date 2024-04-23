@@ -24,24 +24,47 @@ export default class Autobee extends Autobase {
 
   static async apply (batch, view, base) {
     const b = view.batch({ update: false })
+    // Decode operation node key if the Hyperbee view has a keyEncoding set & it
+    // wasn't already decoded.
+    const decodeKey = (x) => b4a.isBuffer(x) && view.keyEncoding
+      ? view.keyEncoding.decode(x)
+      : x
 
     // Process operation nodes
     for (const node of batch) {
       const op = node.value
       if (op.type === 'put') {
-        await b.put(b4a.from(op.key), op.value, op.opts)
+        const encKey = decodeKey(op.key)
+        await b.put(encKey, op.value, op.opts)
       } else if (op.type === 'del') {
-        await b.del(b4a.from(op.key), op.opts)
+        const encKey = decodeKey(op.key)
+        await b.del(encKey, op.opts)
       }
     }
 
     await b.flush()
   }
 
+  _getEncodedKey (key, opts) {
+    // Apply keyEncoding option if provided.
+    // The key is preencoded so that the encoding survives being deserialized
+    // from the input core
+    const encKey = opts && opts.keyEncoding
+      ? opts.keyEncoding.encode(key)
+      : key
+
+    // Clear keyEncoding from options as it has now been applied
+    if (opts && opts.keyEncoding) {
+      delete opts.keyEncoding
+    }
+
+    return encKey
+  }
+
   put (key, value, opts) {
     return this.append({
       type: 'put',
-      key,
+      key: this._getEncodedKey(key, opts),
       value,
       opts
     })
@@ -50,7 +73,7 @@ export default class Autobee extends Autobase {
   del (key, opts) {
     return this.append({
       type: 'del',
-      key,
+      key: this._getEncodedKey(key, opts),
       opts
     })
   }
