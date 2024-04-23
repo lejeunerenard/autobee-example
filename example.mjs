@@ -83,7 +83,7 @@ rl.pause()
 console.log()
 console.log('putting a key')
 
-const simplePut = (db) => db.put(db.local.key, { message: 'was here', timestamp: new Date() })
+const simplePut = (db) => db.put(db.local.key, { message: 'was here', timestamp: new Date().toISOString() })
 
 if (db.writable) {
   await simplePut(db)
