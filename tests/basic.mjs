@@ -5,6 +5,8 @@ import SubEncoder from 'sub-encoder'
 import Autobee from '../index.mjs'
 import b4a from 'b4a'
 import Hyperbee from 'hyperbee'
+import { replicateAndSync } from 'autobase-test-helpers'
+import c from 'compact-encoding'
 
 test('basic usage', (t) => {
   t.test('defaults to use static apply method', async (t) => {
@@ -182,4 +184,60 @@ test('basic usage', (t) => {
       await runGambit(db, t)
     })
   })
+
+  t.test('replication', async (t) => {
+    const store = new Corestore(RAM.reusable())
+    const db = new Autobee(store, null, {
+      apply: applyWithAddWriter,
+      valueEncoding: c.any
+    })
+    await db.ready()
+
+    const store2 = new Corestore(RAM.reusable())
+    const db2 = new Autobee(store2, db.key, {
+      apply: applyWithAddWriter,
+      valueEncoding: c.any
+    })
+
+    await db2.ready()
+
+    await addWriter(db, db2.local.key)
+
+    await db.put('foo', 2)
+    await db.put(b4a.from('bar'), 'string')
+
+    await replicateAndSync([db, db2])
+
+    const fooNode = await db2.get('foo')
+    t.equals(fooNode.value, 2)
+
+    const barNode = await db2.get(b4a.from('bar'))
+    t.equals(barNode.value, 'string')
+
+    await db.close()
+    await db2.close()
+  })
 })
+
+function addWriter (db, key) {
+  return db.append({
+    type: 'addWriter',
+    key
+  })
+}
+
+async function applyWithAddWriter (batch, view, base) {
+  const debug = false
+  // Add .addWriter functionality
+  for (const node of batch) {
+    const op = node.value
+    if (op.type === 'addWriter') {
+      debug && console.log('\rAdding writer', op.key)
+      await base.addWriter(b4a.from(op.key, 'hex'))
+      continue
+    }
+  }
+
+  // Pass through to Autobee's apply
+  await Autobee.apply(batch, view, base)
+}

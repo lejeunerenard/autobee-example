@@ -10,6 +10,7 @@
   "author": "Sean Zellmer <sean@lejeunerenard.com> (http://lejeunerenard.com/)",
   "license": "MIT",
   "devDependencies": {
+    "autobase-test-helpers": "^2.0.5",
     "corestore": "^6.17.0",
     "eslint": "^8.57.0",
     "eslint-config-standard": "^17.1.0",
