@@ -3,6 +3,7 @@ import Hyperswarm from 'hyperswarm'
 import Autobee from './index.mjs'
 import readline from 'readline'
 import b4a from 'b4a'
+import c from 'compact-encoding'
 
 const args = process.argv.slice(2)
 const storageDir = args[1] ?? './storage'
@@ -41,7 +42,7 @@ const db = new Autobee(store, bootstrap, {
   },
 
   // Set encodings for autobase/hyperbee
-  valueEncoding: 'json'
+  valueEncoding: c.any
 })
 // Print any errors from apply() etc
   .on('error', console.error)
